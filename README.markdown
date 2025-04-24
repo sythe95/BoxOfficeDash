@@ -1,71 +1,63 @@
 # Box Office Dash
 
-Interactive Power BI dashboard analyzing box office revenue (2015–2023) by genre, studio, and runtime.
+![Dashboard Screenshot](dashboard_screenshot.png)  
+*Interactive Power BI dashboard visualizing box office revenue (2015–2023).*
 
 ## Overview
 
-This project scrapes, cleans, and visualizes box office data for 5,137 movies, enriched with IMDb genres and runtimes. The Power BI dashboard features a Pie Chart (genres &lt;0.5% gross as "Others"), Bar Chart, Treemap, and more, with slicers for year and genre.
+This project analyzes 5,137 movies (2015–2023) by scraping box office data from Box Office Mojo, enriching with IMDb genres, loading into MySQL, and visualizing in Power BI. The dashboard includes a Pie Chart (genres <0.5% gross as "Others"), Bar Chart, Treemap, and more, with slicers for year and genre.
 
-## Process
+## Workflow
 
-1. **Scrape Data**: `scraper.py` extracts box office data (`movies_raw.csv`) from web sources (2015–2023).
-2. **Clean Data**: `final_cleaning.py` deduplicates and cleans data (`movies_dedup.csv`, `movies_cleaned.csv`, 5,137 rows).
-3. **Enrich Data**: `add_genre.py` matches \~82% of movies with IMDb genres/runtimes (`title.basics.tsv`).
-4. **Load to MySQL**: `loader.py` imports `movies_cleaned.csv` to `movie_scraper` database, fixing `rank` keyword issue.
-5. **Visualize**: `dashboard.pbix` creates interactive Power BI visuals (Pie Chart, Bar Chart, Treemap, etc.).
+```mermaid
+graph TD
+    A[Box Office Mojo] -->|scraper.py| B[movies_raw.csv]
+    B -->|final_cleaning.py| C[movies_dedup.csv]
+    C -->|final_cleaning.py| D[movies_cleaned.csv]
+    E[IMDb title.basics.tsv] -->|add_genre.py| D
+    D -->|loader.py| F[MySQL movie_scraper]
+    F -->|dashboard.pbix| G[Power BI Dashboard]
+```
+
+1. **Scrape**: `scraper.py` extracts data from Box Office Mojo (`movies_raw.csv`).
+2. **Clean**: `final_cleaning.py` deduplicates and cleans (`movies_dedup.csv`, `movies_cleaned.csv`).
+3. **Enrich**: `add_genre.py` adds IMDb genres/runtimes (~82% match).
+4. **Load**: `loader.py` imports to MySQL (`movie_scraper`).
+5. **Visualize**: `dashboard.pbix` builds Power BI visuals.
 
 ## Files
 
 - `data/`:
   - `movies_cleaned.csv`: Final dataset (5,137 rows).
-  - `movies_dedup.csv`: Deduplicated data (\~6,189 rows).
-  - `movies_raw.csv`: Raw scraped data.
-- `add_genre.py`: Matches IMDb genres/runtimes.
+  - `movies_dedup.csv`: Deduplicated (~6,189 rows).
+  - `movies_raw.csv`: Raw data.
+- `add_genre.py`: Matches IMDb genres.
 - `dashboard.pbix`: Power BI dashboard.
-- `final_cleaning.py`: Cleans and deduplicates data.
+- `final_cleaning.py`: Cleans data.
 - `loader.py`: Imports to MySQL.
-- `scraper.py`: Scrapes box office data.
+- `scraper.py`: Scrapes data.
 
-**IMDb Data**: Download `title.basics.tsv` from IMDb Datasets.
+**IMDb Data**: Download `title.basics.tsv` from [IMDb Datasets](https://datasets.imdbws.com/).
 
 ## Setup
 
-1. **Clone Repo**:
-
+1. **Clone**:
    ```bash
    git clone https://github.com/username/BoxOfficeDash.git
    cd BoxOfficeDash
    ```
 
 2. **Virtualenv**:
-
    ```bash
    python -m venv venv
    source venv/bin/activate  # Windows: venv\Scripts\activate
-   pip install numpy pandas mysql-connector-python fuzzywuzzy python-Levenshtein
+   pip install -r requirements.txt
    ```
 
 3. **MySQL**:
-
    - Create `movie_scraper` database.
    - Run `loader.py`.
 
 4. **Power BI**:
-
    - Open `dashboard.pbix`.
-   - Connect to `data/movies_cleaned.csv` or MySQL (`movie_scraper`).
-
-## Usage
-
-- Filter dashboard by year/genre.
-- Analyze trends: Action (\~25%), Adventure (\~20%), \~$15B–$25B total gross.
-- Export PDF for portfolio (`username.github.io`).
-
-## License
-
-MIT License.
-
-## Contact
-
-- **GitHub**: username
-- **Portfolio**: username.github.io
+   - Connect to `data/movies_cleaned.csv` or MySQL.
